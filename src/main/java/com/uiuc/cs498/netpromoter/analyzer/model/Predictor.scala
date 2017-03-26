@@ -3,41 +3,52 @@ package com.uiuc.cs498.netpromoter.analyzer.model
 import org.apache.spark.SparkContext
 import org.apache.spark.mllib.classification.NaiveBayesModel
 import org.apache.spark.mllib.linalg.Vector
+import scala.collection.JavaConverters._
 
  import com.uiuc.cs498.netpromoter.analyzer.TweetParser;
  import com.uiuc.cs498.netpromoter.analyzer.busobj.TweetAnalysis;
+ import com.uiuc.cs498.netpromoter.analyzer.busobj.TweetScore;
 
 class Predictor(context: SparkContext) {
   val ModelPath = "E:/UIUC/CS498/Project/myModel"
   
-  val trainer = new ModelTrainer()
   var model : NaiveBayesModel = null
   
   def trainModel(path: String, separator: String): Unit = {
    println("Starting initialization")
 
    if(separator.equalsIgnoreCase("\t"))
-     model = trainer.trainTSV(path, context)
+     model = ModelTrainer.trainTSV(path, context)
    else
-     model = trainer.trainCSV(path, context)
+     model = ModelTrainer.trainCSV(path, context)
    println("Initialization complete")
   }
   
+  def scoreTweets(tweets: java.util.List[String]): TweetScore = {
+    println("Classifying Multiple Tweets")
+    
+    var score = new TweetScore()
+    val scalaTweets = tweets.asScala.toSet
+    scalaTweets.foreach { tweet =>  
+      var analysis = classifySentiment(tweet)
+      score.addTweet(analysis)
+    }
+    score
+  }
+  
   def classifySentiment(tweetText: String):  TweetAnalysis = {
-     println("\nClassifying tweet: "+tweetText)
-     println("Probability[negative, neutral, positive]")
+     println("Classifying tweet: "+tweetText)
+//     println("Probability[negative, neutral, positive]")
      val cleanedTweetTokens = TweetParser.cleanAndTokenizeTweet(tweetText)
      val featuresVector = TweetParser.generateWordCountVector(cleanedTweetTokens)
 
      var probabilitiesVector = model.predictProbabilities(featuresVector)
-     println(probabilitiesVector)
+//     println(probabilitiesVector)
      
      var analysis = new TweetAnalysis()
      analysis.tweetText(tweetText)
        .score(gradeSentiment(probabilitiesVector))
        .probabilities(probabilitiesVector)
-     
-//     (gradeSentiment(probabilitiesVector),  probabilitiesVector)
   }
   
   private[this] def gradeSentiment(probabilities: Vector): Integer = {

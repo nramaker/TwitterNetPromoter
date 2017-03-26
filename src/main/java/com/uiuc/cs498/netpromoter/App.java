@@ -6,11 +6,15 @@ import spark.Route;
  
 import static spark.Spark.*;
 
-import org.apache.spark.SparkConf;
+import java.util.Arrays;
+import java.util.List;
+
 import org.apache.spark.SparkContext;
 
 import com.google.gson.Gson;
 import com.uiuc.cs498.netpromoter.analyzer.busobj.TweetAnalysis;
+import com.uiuc.cs498.netpromoter.analyzer.busobj.TweetScore;
+import com.uiuc.cs498.netpromoter.analyzer.SparkContextGenerator;
 import com.uiuc.cs498.netpromoter.analyzer.model.Predictor;
 
 public class App 
@@ -25,7 +29,33 @@ public class App
         
         get("/score", (request, response) -> {
         	String tweetSubject = request.queryParams("tweetSubject");
-        	return "Someday I'll score your tweets of "+tweetSubject;
+        	
+        	Gson gson = new Gson();
+        	
+        	SparkContext sparkContext =SparkContextGenerator.getContextInstance();
+        	Predictor predictor = new Predictor(sparkContext);
+        	predictor.trainModel(MOVIE_REVIEW_DATA, TAB_DELIMITER);
+        	
+        	//TODO: getActual tweets from Twitter
+        	List<String> fakeTweets = Arrays.asList(
+        		"happy great awesome",
+        		"happy great awesome fantastic",
+        		"happy great awesome pretty",
+        		"happy great awesome happy",
+        		"happy great awesome kinda",
+           		"happy great pretty",
+        		"happy awesome happy",
+        		"great awesome kinda",
+        		"meh okay bland",
+        		"whatever I guess",
+        		"awful hate terrible",
+        		"awful hate sucks",
+        		"awful terrible sucks",
+        		"hate terrible sucks"
+        	);
+        	TweetScore score = predictor.scoreTweets(fakeTweets);
+        	return gson.toJson(score);
+        	//return "Someday I'll score your tweets of "+tweetSubject;
         });
         get("/classify", (request, response) -> {
         	
@@ -35,11 +65,7 @@ public class App
         	
         	Gson gson = new Gson();
         	
-        	SparkConf sparkConf = new SparkConf().setAppName("TweetNetPromoter")
-        			.setMaster("local[*]")
-        			.set("spark.sql.warehouse.dir", "file:///E:/UIUC/CS498/TweetNetPromoter/")
-        			.set("spark.executor.memory","1g");
-        	SparkContext sparkContext = new SparkContext(sparkConf);
+        	SparkContext sparkContext =SparkContextGenerator.getContextInstance();
             
         	Predictor predictor = new Predictor(sparkContext);
         	predictor.trainModel(MOVIE_REVIEW_DATA, TAB_DELIMITER);
