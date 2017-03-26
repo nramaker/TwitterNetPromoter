@@ -33,9 +33,9 @@ class Predictor(context: SparkContext) {
      println(probabilitiesVector)
      
      var analysis = new TweetAnalysis()
-     analysis.setTweetText(tweetText)
-       .setScore(gradeSentiment(probabilitiesVector))
-       .setProbabilities(probabilitiesVector)
+     analysis.tweetText(tweetText)
+       .score(gradeSentiment(probabilitiesVector))
+       .probabilities(probabilitiesVector)
      
 //     (gradeSentiment(probabilitiesVector),  probabilitiesVector)
   }
