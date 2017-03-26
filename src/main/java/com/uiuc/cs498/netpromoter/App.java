@@ -36,26 +36,13 @@ public class App
         	Predictor predictor = new Predictor(sparkContext);
         	predictor.trainModel(MOVIE_REVIEW_DATA, TAB_DELIMITER);
         	
-        	//TODO: getActual tweets from Twitter
-        	List<String> fakeTweets = Arrays.asList(
-        		"happy great awesome",
-        		"happy great awesome fantastic",
-        		"happy great awesome pretty",
-        		"happy great awesome happy",
-        		"happy great awesome kinda",
-           		"happy great pretty",
-        		"happy awesome happy",
-        		"great awesome kinda",
-        		"meh okay bland",
-        		"whatever I guess",
-        		"awful hate terrible",
-        		"awful hate sucks",
-        		"awful terrible sucks",
-        		"hate terrible sucks"
-        	);
-        	TweetScore score = predictor.scoreTweets(fakeTweets);
-        	return gson.toJson(score);
-        	//return "Someday I'll score your tweets of "+tweetSubject;
+        	SearchTwitter twitter = new SearchTwitter(tweetSubject);
+        	List<String> tweets = twitter.buildTweetsList();
+        	
+        	if(tweets==null || tweets.size()==0)
+        		return "No tweets found!";
+        	
+        	TweetScore score = predictor.scoreTweets(tweets);
         });
         get("/classify", (request, response) -> {
         	

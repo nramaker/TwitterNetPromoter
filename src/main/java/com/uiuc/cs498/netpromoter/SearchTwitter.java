@@ -1,7 +1,7 @@
 package com.uiuc.cs498.netpromoter;
 
 import twitter4j.*;
-import twitter4j.conf.ConfigurationBuilder;
+//import twitter4j.conf.ConfigurationBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,7 +27,7 @@ public class SearchTwitter {
 		}
 	}
 
-	private List<String> buildTweetsList() throws TwitterException, InterruptedException {
+	public List<String> buildTweetsList() throws TwitterException, InterruptedException {
 		List<String> tweetsList = new ArrayList<String>();
 		final int MAX_QUERIES = 5;
 		final int TWEETS_PER_QUERY = 100;
