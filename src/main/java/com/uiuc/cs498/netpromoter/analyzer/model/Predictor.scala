@@ -5,6 +5,7 @@ import org.apache.spark.mllib.classification.NaiveBayesModel
 import org.apache.spark.mllib.linalg.Vector
 
  import com.uiuc.cs498.netpromoter.analyzer.TweetParser;
+ import com.uiuc.cs498.netpromoter.analyzer.busobj.TweetAnalysis;
 
 class Predictor(context: SparkContext) {
   val ModelPath = "E:/UIUC/CS498/Project/myModel"
@@ -22,7 +23,7 @@ class Predictor(context: SparkContext) {
    println("Initialization complete")
   }
   
-  def classifySentiment(tweetText: String):  (Integer, Vector) = {
+  def classifySentiment(tweetText: String):  TweetAnalysis = {
      println("\nClassifying tweet: "+tweetText)
      println("Probability[negative, neutral, positive]")
      val cleanedTweetTokens = TweetParser.cleanAndTokenizeTweet(tweetText)
@@ -30,7 +31,13 @@ class Predictor(context: SparkContext) {
 
      var probabilitiesVector = model.predictProbabilities(featuresVector)
      println(probabilitiesVector)
-     (gradeSentiment(probabilitiesVector),  probabilitiesVector)
+     
+     var analysis = new TweetAnalysis()
+     analysis.setTweetText(tweetText)
+       .setScore(gradeSentiment(probabilitiesVector))
+       .setProbabilities(probabilitiesVector)
+     
+//     (gradeSentiment(probabilitiesVector),  probabilitiesVector)
   }
   
   private[this] def gradeSentiment(probabilities: Vector): Integer = {

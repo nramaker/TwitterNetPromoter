@@ -21,11 +21,11 @@ object TweetAnalyzer {
     predictor.trainModel(MovieReviewData, TabDelimiter);
             
     var result = predictor.classifySentiment("great amazing fantastic")
-    println("Score: "+result._1)
+//    println("Score: "+result._1)
     result = predictor.classifySentiment("hate terrible sucks")
-    println("Score: "+result._1)
+//    println("Score: "+result._1)
     result = predictor.classifySentiment("meh whatever done")
-    println("Score: "+result._1)
+//    println("Score: "+result._1)
     
     println("Normal exit")
   }

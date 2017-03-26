@@ -33,7 +33,7 @@ public class SearchTwitter {
 		final int TWEETS_PER_QUERY = 100;
 		int totalTweets = 0;
 		long maxID = -1;
-		Twitter twitter = TwitterApi.getTwitter();
+		Twitter twitter = null;//TwitterApi.getTwitter();
 		Map<String, RateLimitStatus> rateLimitStatus = twitter.getRateLimitStatus("search");
 		RateLimitStatus searchTweetsRateLimit = rateLimitStatus.get("/search/tweets");
 

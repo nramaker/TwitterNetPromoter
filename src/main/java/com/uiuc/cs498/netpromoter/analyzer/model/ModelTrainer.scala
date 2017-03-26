@@ -10,6 +10,9 @@ package com.uiuc.cs498.netpromoter.analyzer.model
  import org.apache.spark.sql.Dataset
  import org.apache.spark.rdd.RDD
  
+ import java.util.Enumeration;
+ import java.net.URL;
+ 
  import com.uiuc.cs498.netpromoter.analyzer.TweetParser;
 
 class ModelTrainer() {
@@ -47,15 +50,20 @@ class ModelTrainer() {
   }
     
   def trainTSV(tsvFile: String, context: SparkContext): NaiveBayesModel = {
-    println("training model from CSV file")
-
+    println("training model from TSV file")
+    println("loading data file: "+tsvFile)
+    println(getClass.getResource("/"+tsvFile))
+    
+    
       var sqlContext = SQLContext.getOrCreate(context)
       var tweetDataFrame = sqlContext.read
         .format("com.databricks.spark.csv")
         .option("delimiter", "\t")
         .load(tsvFile)
         .toDF("PhraseId","SentenceId","Phrase","Sentiment")
-       
+        
+        //.load(tsvFile)
+        
       val header = tweetDataFrame.first()
       tweetDataFrame = tweetDataFrame.filter(row => row != header)
 
