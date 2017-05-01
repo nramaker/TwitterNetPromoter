@@ -5,23 +5,33 @@ import org.apache.spark.mllib.classification.NaiveBayesModel
 import org.apache.spark.mllib.linalg.Vector
 import scala.collection.JavaConverters._
 
- import com.uiuc.cs498.netpromoter.analyzer.TweetParser;
- import com.uiuc.cs498.netpromoter.analyzer.busobj.TweetAnalysis;
- import com.uiuc.cs498.netpromoter.analyzer.busobj.TweetScore;
+import com.uiuc.cs498.netpromoter.analyzer.TweetParser;
+import com.uiuc.cs498.netpromoter.analyzer.busobj.TweetAnalysis
+import com.uiuc.cs498.netpromoter.analyzer.busobj.TweetScore
+import com.uiuc.cs498.netpromoter.analyzer.WordCounter
 
-class Predictor(context: SparkContext) {
+class Predictor(context: SparkContext, method: String) {
   val ModelPath = "E:/UIUC/CS498/Project/myModel"
   
   var model : NaiveBayesModel = null
+  var predictionMethod = method;
   
   def trainModel(path: String, separator: String): Unit = {
    println("Starting initialization")
 
-   if(separator.equalsIgnoreCase("\t"))
-     model = ModelTrainer.trainTSV(path, context)
-   else
-     model = ModelTrainer.trainCSV(path, context)
-   println("Initialization complete")
+     WordCounter.clear()
+     
+     if(predictionMethod!="stanford"){
+       if(separator.equalsIgnoreCase("\t"))
+         model = ModelTrainer.trainTSV(path, context)
+       else
+         model = ModelTrainer.trainCSV(path, context)
+       println("NaiveBeyes Initialization complete")
+     }
+     else
+     {
+       println("StanfordCoreNLP Initialization complete")
+     }
   }
   
   def scoreTweets(tweets: java.util.List[String]): TweetScore = {
@@ -38,17 +48,28 @@ class Predictor(context: SparkContext) {
   
   def classifySentiment(tweetText: String):  TweetAnalysis = {
      println("Classifying tweet: "+tweetText)
-//     println("Probability[negative, neutral, positive]")
-     val cleanedTweetTokens = TweetParser.cleanAndTokenizeTweet(tweetText)
+     val cleanedTweetTokens = TweetParser.cleanAndTokenizeTweet(tweetText, true)
      val featuresVector = TweetParser.generateWordCountVector(cleanedTweetTokens)
 
-     var probabilitiesVector = model.predictProbabilities(featuresVector)
-//     println(probabilitiesVector)
+     if(predictionMethod!="stanford"){
+       var probabilitiesVector = model.predictProbabilities(featuresVector)
+     val naiveBeyesScore = gradeSentiment(probabilitiesVector);
+     println("NaiveBeyes score = "+naiveBeyesScore)
+     println("")
      
      var analysis = new TweetAnalysis()
      analysis.tweetText(tweetText)
-       .score(gradeSentiment(probabilitiesVector))
+       .score(naiveBeyesScore)
        .probabilities(probabilitiesVector)
+     }
+     else{
+       var stanfordNLPScore = StanfordNLPScorer.scoreTweet(tweetText)
+       println("Stanford score = "+stanfordNLPScore)
+       println("")
+       var analysis = new TweetAnalysis()
+     analysis.tweetText(tweetText)
+       .score(stanfordNLPScore)
+     }
   }
   
   private[this] def gradeSentiment(probabilities: Vector): Integer = {

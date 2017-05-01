@@ -2,6 +2,7 @@ package com.uiuc.cs498.netpromoter.analyzer
 
 import org.apache.spark.mllib.linalg.Vector
 import org.apache.spark.mllib.feature.HashingTF
+import com.uiuc.cs498.netpromoter.analyzer.WordCounter
 
 object TweetParser {
   
@@ -13,17 +14,35 @@ object TweetParser {
       "then","once","here","there","when","where","why","how","all","any","both","each","few","more","most","other","some","such","no",
       "nor","not","only","own","same","so","than","too","very","s","t","can","will","just","don","should","now")
       
-  def cleanAndTokenizeTweet(text: String): Seq[String] = {
-    text.toLowerCase()
+  def cleanAndTokenizeTweet(text: String, countWords:Boolean = false): Seq[String] = {
+    var tokens : Seq[String] = text.toLowerCase()
       .replaceAll("@\\w+", "")
       .replaceAll("#\\w+", "")
       .split("\\s")
       .filter(_.matches("^[a-zA-Z]+$"))
       .filter(!stopwords.contains(_))
+     
+    if(countWords)
+      WordCounter.incrementWords(tokens)  
+    tokens
   }
   
   def generateWordCountVector(tweetTokens: Seq[String]): Vector = {
      var vectorGenerator = new HashingTF()
      vectorGenerator.transform(tweetTokens)
+  }
+  
+  def cleanTweet(text: String,countWords:Boolean = false): String = {
+    var tokens = cleanAndTokenizeTweet(text, countWords)
+    var cleaned = ""
+    
+    tokens.foreach { x => {
+      if(cleaned.length()==0) 
+        cleaned = x 
+      else 
+        cleaned +=" "+x
+     }
+    }
+    cleaned
   }
 }

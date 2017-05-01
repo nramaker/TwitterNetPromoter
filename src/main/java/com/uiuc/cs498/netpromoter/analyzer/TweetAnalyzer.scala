@@ -17,7 +17,7 @@ object TweetAnalyzer {
     val sparkConf = new SparkConf().setAppName("TweetAnalyzer").setMaster("local[*]").set("spark.executor.memory","1g");
     var sparkContext = new SparkContext(sparkConf)
     
-    var predictor = new Predictor(sparkContext)
+    var predictor = new Predictor(sparkContext,"stanford")
     predictor.trainModel(MovieReviewData, TabDelimiter);
             
     var result = predictor.classifySentiment("great amazing fantastic")
