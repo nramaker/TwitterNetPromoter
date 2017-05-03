@@ -71,25 +71,26 @@ class TweetScore() {
     this
   }
   
-  def calcWordCounts(): TweetScore = {
+  def calcWordCounts(searchTerm: String): TweetScore = {
     var words: java.util.Map[String, Integer] = WordCounter.getWordCounts()
     
     var iteration = 0
-    var maxIteration = 100
+    var maxIteration = 102
     
     while(iteration < maxIteration){
       var highestVal: Int = 0
       var highestWord = ""
       for((k,v) <- words.asScala.toSet){
-        if(v > highestVal){
+         if(v > highestVal){
           highestWord = k
           highestVal = v
         }
       }
       if(highestVal>0){
-//        println("top word: "+highestWord+" count: "+highestVal)
-        var tweetWord = new TweetTopWord(highestWord, highestVal)
-        this.topWords.add(topWords.size(), tweetWord)
+        if(highestWord!="rt" && highestWord!=searchTerm){
+          var tweetWord = new TweetTopWord(highestWord, highestVal)
+          this.topWords.add(topWords.size(), tweetWord)
+        }
         words.remove(highestWord)
       }
       iteration+=1

@@ -1,24 +1,24 @@
 package com.uiuc.cs498.netpromoter.analyzer.busobj
 
 class TweetTopWord(n: String, c: Int) {
-  var name=n
-  var count=c
+  var text=n
+  var weight=c
   
-  def name(n: String): TweetTopWord = {
-    this.name=n
+  def text(n: String): TweetTopWord = {
+    this.text=n
     this
   }
   
-  def getName(): String = {
-    this.name
+  def gettext(): String = {
+    this.text
   }
   
-  def count(c: Int): TweetTopWord = {
-    this.count=c
+  def weight(c: Int): TweetTopWord = {
+    this.weight=c
     this
   }
   
-  def getCount(): Int = {
-    this.count
+  def getweight(): Int = {
+    this.weight
   }
 }

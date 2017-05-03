@@ -22,16 +22,19 @@ public class App
 	
 	public static final String MOVIE_REVIEW_DATA= "resources/data/movie_reviews/train.tsv";
 	public static final String TAB_DELIMITER = "\t";
+	public static final String STANFORDCORENLP="stanford";
 	
 	
     public static void main(String[] args) {
-        get("/", (request, response) -> "Hello World");
+      	staticFiles.location("/public");
+
+        get("/test", (request, response) -> "Hello World");
         
         get("/score", (request, response) -> {
         	String tweetSubject = request.queryParams("tweetSubject");
         	String method = request.queryParams("method");
         	if(method==null)
-        		method = "stanford";
+        		method = STANFORDCORENLP;
         	
         	Gson gson = new Gson();
         	
@@ -46,7 +49,8 @@ public class App
         		return "No tweets found!";
         	
         	TweetScore score = predictor.scoreTweets(tweets);
-            score.calcWordCounts();
+        	score.setModel(method);
+            score.calcWordCounts(tweetSubject.toLowerCase());
             score.calcScore();
         	return gson.toJson(score, TweetScore.class);
         });
