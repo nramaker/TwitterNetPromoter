@@ -1,8 +1,8 @@
 package com.uiuc.cs498.netpromoter.analyzer
 
-import com.uiuc.cs498.netpromoter.analyzer.busobj.TweetTopWord;
-import com.uiuc.cs498.netpromoter.analyzer.busobj.TweetTopWord
-import com.uiuc.cs498.netpromoter.analyzer.busobj.TweetTopWord
+//import com.uiuc.cs498.netpromoter.analyzer.busobj.TweetTopWord;
+//import com.uiuc.cs498.netpromoter.analyzer.busobj.TweetTopWord
+//import com.uiuc.cs498.netpromoter.analyzer.busobj.TweetTopWord
 
 object WordCounter {
   var topWords: java.util.Map[String, Integer] = new java.util.HashMap[String, Integer]()
