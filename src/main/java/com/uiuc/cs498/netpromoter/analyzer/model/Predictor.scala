@@ -7,8 +7,12 @@ import scala.collection.JavaConverters._
 
 import com.uiuc.cs498.netpromoter.analyzer.TweetParser;
 import com.uiuc.cs498.netpromoter.analyzer.busobj.TweetAnalysis
+import com.uiuc.cs498.netpromoter.analyzer.busobj.TextAnalysis
 import com.uiuc.cs498.netpromoter.analyzer.busobj.TweetScore
 import com.uiuc.cs498.netpromoter.analyzer.WordCounter
+
+import java.util.HashMap;
+import java.util.Map;
 
 class Predictor(context: SparkContext, method: String) {
   val ModelPath = "E:/UIUC/CS498/Project/myModel"
@@ -70,6 +74,24 @@ class Predictor(context: SparkContext, method: String) {
      analysis.tweetText(tweetText)
        .score(stanfordNLPScore)
      }
+  }
+  
+    def classifyText(text: String):  TextAnalysis = {
+     println("Classifying text: "+text)
+//     val cleanedTweetTokens = TweetParser.cleanAndTokenizeTweet(text, true)
+     //val featuresVector = TweetParser.generateWordCountVector(cleanedTweetTokens)
+
+     
+     val tuple = StanfordNLPScorer.scoreText(text)
+     var stanfordNLPScore = tuple._1
+     var map : HashMap[String, Double] = tuple._2
+     
+     println("Stanford score = "+stanfordNLPScore)
+     println("")
+     var analysis = new TextAnalysis()
+     analysis.text(text)
+       .score(stanfordNLPScore)
+       .setCounts(map)
   }
   
   private[this] def gradeSentiment(probabilities: Vector): Integer = {

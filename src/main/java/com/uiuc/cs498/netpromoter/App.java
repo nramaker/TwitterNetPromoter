@@ -13,6 +13,7 @@ import org.apache.spark.SparkContext;
 
 import com.google.gson.Gson;
 import com.uiuc.cs498.netpromoter.analyzer.busobj.TweetAnalysis;
+import com.uiuc.cs498.netpromoter.analyzer.busobj.TextAnalysis;
 import com.uiuc.cs498.netpromoter.analyzer.busobj.TweetScore;
 import com.uiuc.cs498.netpromoter.analyzer.SparkContextGenerator;
 import com.uiuc.cs498.netpromoter.analyzer.model.Predictor;
@@ -54,21 +55,24 @@ public class App
             score.calcScore();
         	return gson.toJson(score, TweetScore.class);
         });
-//        get("/classify", (request, response) -> {
-//        	
-//        	String tweetText = request.queryParams("tweetText");
-//        	if(tweetText==null)
-//        		return "Empty tweet!";
-//        	
-//        	Gson gson = new Gson();
-//        	
-//        	SparkContext sparkContext =SparkContextGenerator.getContextInstance();
-//            
-//        	Predictor predictor = new Predictor(sparkContext);
-//        	predictor.trainModel(MOVIE_REVIEW_DATA, TAB_DELIMITER);
-//            
-//            TweetAnalysis analysis = predictor.classifySentiment(tweetText);
-//            return gson.toJson(analysis, TweetAnalysis.class);
-//        });
+        get("/classify", (request, response) -> {
+        	
+        	String text = request.queryParams("text");
+        	String method = request.queryParams("method");
+        	if(method==null)
+        		method = STANFORDCORENLP;
+        	if(text==null)
+        		return "Empty text!";
+        	
+        	Gson gson = new Gson();
+        	
+        	SparkContext sparkContext =SparkContextGenerator.getContextInstance();
+            
+        	Predictor predictor = new Predictor(sparkContext, method );
+        	predictor.trainModel(MOVIE_REVIEW_DATA, TAB_DELIMITER);
+            
+            TextAnalysis analysis = predictor.classifyText(text);
+            return gson.toJson(analysis, TextAnalysis.class);
+        });
     }
 }
